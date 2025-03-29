@@ -2,13 +2,14 @@
 @using NorthwindCloud
 @using Models.NorthwindCloud
 @inject INorthwindCloudService NorthwindCloudService
+@inject IJSRuntime JSRuntime
 
 <div class="row-layout filter-api-container">
     <div class="column-layout group">
         <IgbList class="list" filter_api-scope>
             @foreach (var item in _northwindCloudEmployeeStringfAnonymousType9)
             {
-                <IgbListItem @onclick="@(() => _selectedEmployee = item.Employee.EmployeeID)">
+                <IgbListItem @onclick="@(() => OnEmployeeCardClicked(item))">
                     <IgbAvatar Src="@(item.Employee?.PhotoPath ?? default)" slot="start" class="avatar" filter_api-scope></IgbAvatar>
                     <div slot="title">@item.FullName</div>
                     <div slot="subtitle">@item.Employee?.Title</div>
@@ -17,17 +18,39 @@
         </IgbList>
     </div>
     <div class="column-layout group_1">
-        <span class="reveal-dash-board">RevealDashBoard not yet available in Blazor</span>
+        <div @ref="revealViewRef" id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div>
+
+        @* <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div> *@
     </div>
 </div>
 
 @code {
     private int _selectedEmployee;
     private List<EmployeeStringfAnonymousType9> _northwindCloudEmployeeStringfAnonymousType9 = new();
+    private ElementReference revealViewRef;
+
 
     protected override async Task OnInitializedAsync()
     {
         _northwindCloudEmployeeStringfAnonymousType9 = await NorthwindCloudService.GetEmployeeStringfAnonymousType9List();
         await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", "Employee Sales Analysis");
+        }
+    }
+
+    private async Task OnEmployeeCardClicked(EmployeeStringfAnonymousType9 employeeData)
+    {
+        _selectedEmployee = employeeData.Employee.EmployeeID;
+
+        if (_selectedEmployee != 0)
+        {
+            await JSRuntime.InvokeVoidAsync("setDashboardFilter", "revealView", "EmployeeID", _selectedEmployee);
+        }
     }
 }

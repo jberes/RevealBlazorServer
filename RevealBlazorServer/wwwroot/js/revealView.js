@@ -25,6 +25,7 @@ window.loadRevealView = async function (viewId, dashboardName) {
     revealView.dashboard = rvDashboard;
 }
 
+
 window.createRevealView = function (viewId, singleVisualizationMode) {
     $.ig.RevealSdkSettings.theme = createRevealTheme(viewId, singleVisualizationMode)
 
@@ -68,6 +69,24 @@ window.createDashboardThumbnail = function (id, info) {
     let thumbnailView = new $.ig.RevealDashboardThumbnailView("#" + id);
     thumbnailView.dashboardInfo = info;
 }
+
+
+
+window.setDashboardFilter = async function (viewId, filterTitle, filterValue) {
+    let rvDashboard = await $.ig.RVDashboard.loadDashboard("Employee Sales Analysis");
+
+    //const revealView = createRevealView(viewId, "Employee Sales Analysis");
+    const revealView = new $.ig.RevealView("#" + viewId);
+    revealView.dashboard = rvDashboard;
+
+    const territoryFilter = revealView.dashboard.filters.getByTitle(filterTitle);
+    if (territoryFilter) {
+        territoryFilter.selectedValues = [filterValue];
+    } else {
+        console.warn("Filter not found:", filterTitle);
+    }
+}
+
 
 function downloadFile(url, filename) {
     var link = document.createElement('a');

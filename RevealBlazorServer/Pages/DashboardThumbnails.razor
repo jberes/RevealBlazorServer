@@ -2,13 +2,14 @@
 @using AcmeAnalyticsServer
 @using Models.AcmeAnalyticsServer
 @inject IAcmeAnalyticsServerService AcmeAnalyticsServerService
+@inject IJSRuntime JSRuntime
 
 <div class="row-layout dashboard-thumbnails-container">
     <div class="column-layout group">
         <IgbList class="list" dashboard_thumbnails-scope>
             @foreach (var item in _acmeAnalyticsServerDashboardNames)
             {
-                <IgbListItem @onclick="@(() => _selectedDashboard1 = item.DashboardFileName)">
+                <IgbListItem @onclick="@(() => OnDashboardCardClicked(item))">
                     <IgbAvatar slot="start" class="avatar" dashboard_thumbnails-scope>
                         <span class="material-icons">
                             person
@@ -33,5 +34,15 @@
     {
         _acmeAnalyticsServerDashboardNames = await AcmeAnalyticsServerService.GetDashboardNamesList();
         await base.OnInitializedAsync();
+    }
+
+    private async Task OnDashboardCardClicked(DashboardNames dashboard)
+    {
+        _selectedDashboard1 = dashboard.DashboardFileName;
+
+        if (!string.IsNullOrEmpty(_selectedDashboard1))
+        {
+            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", _selectedDashboard1);
+        }
     }
 }
