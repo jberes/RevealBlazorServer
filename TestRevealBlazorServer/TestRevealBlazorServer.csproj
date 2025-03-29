@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="bunit" Version="1.38.5" />
     <PackageReference Include="bunit.core" Version="1.38.5" />
-    <PackageReference Include="IgniteUI.Blazor" Version="24.2.71" />
+    <PackageReference Include="IgniteUI.Blazor.Trial" Version="24.2.71" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Moq" Version="4.18.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
