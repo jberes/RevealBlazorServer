@@ -8,7 +8,7 @@
         <IgbList class="list" filter_api-scope>
             @foreach (var item in _northwindCloudEmployeeStringfAnonymousType9)
             {
-                <IgbListItem @onclick="@(() => _selectedEmployee = item.Employee?.EmployeeID)">
+                <IgbListItem @onclick="@(() => _selectedEmployee = item.Employee.EmployeeID)">
                     <IgbAvatar Src="@(item.Employee?.PhotoPath ?? default)" slot="start" class="avatar" filter_api-scope></IgbAvatar>
                     <div slot="title">@item.FullName</div>
                     <div slot="subtitle">@item.Employee?.Title</div>
@@ -22,7 +22,7 @@
 </div>
 
 @code {
-    private double _selectedEmployee;
+    private int _selectedEmployee;
     private List<EmployeeStringfAnonymousType9> _northwindCloudEmployeeStringfAnonymousType9 = new();
 
     protected override async Task OnInitializedAsync()

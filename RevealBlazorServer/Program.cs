@@ -5,6 +5,9 @@ using RevealBlazorServer.AcmeAnalyticsServer;
 using RevealBlazorServer.NorthwindCloud;
 using RevealBlazorServer.State;
 using IgniteUI.Blazor.Controls;
+using Reveal.Sdk;
+using RevealSdk.Server.Reveal;
+using Reveal.Sdk.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +36,23 @@ void RegisterIgniteUI(IServiceCollection services)
     );
 }
 
+
+
+builder.Services.AddControllers().AddReveal(builder =>
+{
+    builder
+        //.AddSettings(settings =>
+        //{
+        //    settings.License = "eyJhbGciOicCI6IkpXVCJ9.e";
+        //})
+        .AddAuthenticationProvider<AuthenticationProvider>()
+        .AddDataSourceProvider<DataSourceProvider>()
+        .AddUserContextProvider<UserContextProvider>()
+        .AddObjectFilter<ObjectFilterProvider>()
+        .DataSources.RegisterMicrosoftSqlServer();
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -42,14 +62,21 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+// Required for Reveal
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 
 app.Run();
