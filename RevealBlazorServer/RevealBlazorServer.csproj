@@ -59,7 +59,6 @@
     <None Update="Pages/BasicAdd.razor.css" CssScope="basic_add-scope" />
     <None Update="Pages/FilterApi.razor.css" CssScope="filter_api-scope" />
     <None Update="Pages/VizCatalog.razor.css" CssScope="viz_catalog-scope" />
-    <None Update="Pages/CustomFilter.razor.css" CssScope="custom_filter-scope" />
     <None Update="Pages/DashboardThumbnails.razor.css" CssScope="dashboard_thumbnails-scope" />
   </ItemGroup>
 </Project>

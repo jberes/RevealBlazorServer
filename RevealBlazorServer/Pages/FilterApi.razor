@@ -14,8 +14,16 @@
             <IgbList class="list" filter_api-scope>
                 @foreach (var item in employeeInfo)
                 {
-                    <IgbListItem @onclick="@(() => OnEmployeeCardClicked(item))">
-                        <IgbAvatar Src="@(item.Employee?.PhotoPath ?? string.Empty)" slot="start" class="avatar" filter_api-scope></IgbAvatar>
+                    <IgbListItem 
+                        style="@SelectCustomCss(item.Employee?.EmployeeID ?? 0)"
+                        @onclick="@(() => OnEmployeeCardClicked(item))">
+
+                        <IgbAvatar 
+                            Src="@(item.Employee?.PhotoPath ?? string.Empty)" 
+                            slot="start" 
+                            class="avatar" 
+                            filter_api-scope />
+
                         <div slot="title">@item.FullName</div>
                         <div slot="subtitle">@item.Employee?.Title</div>
                     </IgbListItem>
@@ -23,6 +31,7 @@
             </IgbList>
         }
     </div>
+
     <div class="column-layout group_1">
         <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div>
     </div>
@@ -31,7 +40,6 @@
 @code {
     private int selectedEmployee;
     private List<EmployeeInfo> employeeInfo;
-    private bool readyToRender = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,5 +63,10 @@
         {
             await JSRuntime.InvokeVoidAsync("setDashboardFilter", "revealView", "EmployeeID", selectedEmployee);
         }
+    }
+
+    private string SelectCustomCss(int employeeId)
+    {
+        return employeeId == selectedEmployee ? "background-color: #ededed; border-left: 4px solid #09B1A9;" : string.Empty;
     }
 }

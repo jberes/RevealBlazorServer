@@ -11,7 +11,7 @@ namespace RevealSdk.Server.Reveal
             string userId = aspnetContext.Request.Headers["x-header-customerId"].FirstOrDefault();
             string orderId = aspnetContext.Request.Headers["x-header-orderId"].FirstOrDefault();
             string employeeId = aspnetContext.Request.Headers["x-header-employeeId"].FirstOrDefault();
-            string tenantId = aspnetContext.Request.Headers["x-header-tenantId"].FirstOrDefault();
+            //string tenantId = aspnetContext.Request.Headers["x-header-tenantId"].FirstOrDefault();
 
             // Initialize role to "User"
             string role = "User";
@@ -27,7 +27,7 @@ namespace RevealSdk.Server.Reveal
                     { "EmployeeId", employeeId },
                     { "Role", role } };
 
-            Console.WriteLine("UserContextProvider: " + userId + " " + orderId + " " + employeeId);
+            //Console.WriteLine("UserContextProvider: " + userId + " " + orderId + " " + employeeId);
             
             return new RVUserContext(userId, props);
         }

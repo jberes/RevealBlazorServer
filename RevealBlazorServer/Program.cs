@@ -44,6 +44,11 @@ builder.Services.AddControllers().AddReveal(builder =>
         .DataSources.RegisterMicrosoftSqlServer();
 });
 
+builder.Services.AddServerSideBlazor()
+    .AddHubOptions(options =>
+    {
+        options.MaximumReceiveMessageSize = 1024 * 1024; // 1 MB
+    });
 
 var app = builder.Build();
 

@@ -1,16 +1,102 @@
 @page "/basic-add"
+@using Reveal.Sdk
+@using Reveal.Sdk.Dom
+@using Newtonsoft.Json
+@inject IJSRuntime JSRuntime
 
 <div class="column-layout basic-add-container">
     <div class="column-layout group">
-        <IgbButton DisplayType="ButtonBaseType.Button" class="button" basic_add-scope>
-            New Dashboard
+        <IgbButton Size="SizableComponentSize.Large" 
+            @onclick="OnNewDashboardClick" 
+            class="button" basic_add-scope>
+            @buttonText
             <IgbRipple></IgbRipple>
         </IgbButton>
     </div>
     <div class="column-layout group_1">
-        <span class="reveal-dash-board">RevealDashBoard not yet available in Blazor</span>
+        <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 80px); width: 100%; position:relative;"></div>
     </div>
+
+    <IgbDialog CloseOnOutsideClick="false" @ref="_nameDialog">
+        <h5 slot="title">
+            Enter Dashboard Name
+        </h5>
+        <IgbInput Outlined="true" ValueChanged="@(e => newDashboardName = e)" class="input" basic_add-scope></IgbInput>
+        <div slot="footer">
+            <IgbButton Variant="ButtonVariant.Outlined" Size="SizableComponentSize.Large" class="button" @onclick="CancelDashboardName">
+                Cancel
+                <IgbRipple></IgbRipple>
+            </IgbButton>
+            <IgbButton Size="SizableComponentSize.Large" class="button" @onclick="ConfirmDashboardName">
+                OK
+                <IgbRipple></IgbRipple>
+            </IgbButton>
+        </div>
+    </IgbDialog>
 </div>
 
 @code {
+    private IgbDialog _nameDialog;
+    private string buttonText = "New Dashboard";
+    private bool isCreatingNewDashboard = false;
+    private string newDashboardName = "";
+    private RdashDocument dashboardDocument;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("registerAddDashboardInstance", 
+                    DotNetObjectReference.Create(this));
+        }
+    }
+
+    private async Task OnNewDashboardClick()
+    {
+        if (isCreatingNewDashboard)
+        {
+            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", "");
+            isCreatingNewDashboard = false;
+            buttonText = "New Dashboard";
+        }
+        else
+        {
+            dashboardDocument = new RdashDocument("New Dashboard");
+            var json = dashboardDocument.ToJsonString();
+            await JSRuntime.InvokeVoidAsync("loadRevealViewWithDom", "revealView", json);
+            isCreatingNewDashboard = true;
+            buttonText = "Cancel";
+        }
+    }
+
+    [JSInvokable]
+    public async Task SaveDashboard()
+    {
+        await _nameDialog.ToggleAsync(); 
+    }
+
+    private async Task ConfirmDashboardName()
+    {
+        await _nameDialog.ToggleAsync();
+
+        if (string.IsNullOrWhiteSpace(newDashboardName))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Dashboard name is required.");
+            return;
+        }
+
+        dashboardDocument.Title = newDashboardName;
+
+        await JSRuntime.InvokeVoidAsync("saveDashboardToServer", dashboardDocument.ToJsonString(), newDashboardName);
+
+        // Reset state
+        isCreatingNewDashboard = false;
+        buttonText = "New Dashboard";
+        newDashboardName = "";
+    }
+
+    private async Task CancelDashboardName()
+    {
+        await _nameDialog.ToggleAsync();
+    }
 }

@@ -75,3 +75,8 @@
 .avatar::part(base) {
     background-color: transparent;
 }
+.selected {
+    background-color: #ECFBFB; 
+    border-left: 4px solid #09B1A9;
+    outline: 2px dashed red !important;
+}
