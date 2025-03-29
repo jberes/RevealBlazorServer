@@ -1,0 +1,25 @@
+@page "/"
+@page "/basic-load"
+@using AcmeAnalyticsServer
+@using Models.AcmeAnalyticsServer
+@inject IAcmeAnalyticsServerService AcmeAnalyticsServerService
+
+<div class="column-layout basic-load-container">
+    <div class="column-layout group">
+        <IgbCombo Outlined="true" Data="@_acmeAnalyticsServerDashboardNames" ValueKey="DashboardFileName" DisplayKey="DashboardTitle" T="object" SingleSelect="true" Change="@((IgbComboChangeEventArgs e) => _selectedDashboard = e.Detail.NewValue.FirstOrDefault() as DashboardNames)" class="single-select-combo" basic_load-scope></IgbCombo>
+    </div>
+    <div class="column-layout group_1">
+        <span class="reveal-dash-board">RevealDashBoard not yet available in Blazor</span>
+    </div>
+</div>
+
+@code {
+    private string _selectedDashboard;
+    private List<DashboardNames> _acmeAnalyticsServerDashboardNames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _acmeAnalyticsServerDashboardNames = await AcmeAnalyticsServerService.GetDashboardNamesList();
+        await base.OnInitializedAsync();
+    }
+}

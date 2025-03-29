@@ -1,0 +1,37 @@
+@page "/dashboard-thumbnails"
+@using AcmeAnalyticsServer
+@using Models.AcmeAnalyticsServer
+@inject IAcmeAnalyticsServerService AcmeAnalyticsServerService
+
+<div class="row-layout dashboard-thumbnails-container">
+    <div class="column-layout group">
+        <IgbList class="list" dashboard_thumbnails-scope>
+            @foreach (var item in _acmeAnalyticsServerDashboardNames)
+            {
+                <IgbListItem @onclick="@(() => _selectedDashboard1 = item.DashboardFileName)">
+                    <IgbAvatar slot="start" class="avatar" dashboard_thumbnails-scope>
+                        <span class="material-icons">
+                            person
+                        </span>
+                    </IgbAvatar>
+                    <div slot="title">@item.DashboardTitle</div>
+                    <div slot="subtitle">@item.DashboardFileName</div>
+                </IgbListItem>
+            }
+        </IgbList>
+    </div>
+    <div class="column-layout group_1">
+        <span class="reveal-dash-board">RevealDashBoard not yet available in Blazor</span>
+    </div>
+</div>
+
+@code {
+    private string _selectedDashboard1;
+    private List<DashboardNames> _acmeAnalyticsServerDashboardNames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _acmeAnalyticsServerDashboardNames = await AcmeAnalyticsServerService.GetDashboardNamesList();
+        await base.OnInitializedAsync();
+    }
+}

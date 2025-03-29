@@ -1,0 +1,40 @@
+@page "/viz-catalog"
+@using AcmeAnalyticsServer
+@using Models.AcmeAnalyticsServer
+@inject IAcmeAnalyticsServerService AcmeAnalyticsServerService
+
+<div class="row-layout viz-catalog-container">
+    <div class="column-layout group">
+        <div class="column-layout group_1">
+            <IgbList class="list" viz_catalog-scope>
+                @foreach (var item in _acmeAnalyticsServerVisualizationChartInfo)
+                {
+                    <IgbListItem>
+                        <IgbAvatar Src="@(item.VizChartType ?? default)" slot="start" class="avatar" viz_catalog-scope></IgbAvatar>
+                        <div slot="title">@item.VizTitle</div>
+                        <div slot="subtitle">@item.DashboardTitle</div>
+                        <span slot="end" class="material-icons icon">
+                            add
+                        </span>
+                    </IgbListItem>
+                }
+            </IgbList>
+        </div>
+        <div class="column-layout group_2">
+            <span class="reveal-dash-board">RevealDashBoard not yet available in Blazor</span>
+        </div>
+    </div>
+    <div class="column-layout group_3">
+        <span class="reveal-dash-board">RevealDashBoard not yet available in Blazor</span>
+    </div>
+</div>
+
+@code {
+    private List<VisualizationChartInfo> _acmeAnalyticsServerVisualizationChartInfo = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _acmeAnalyticsServerVisualizationChartInfo = await AcmeAnalyticsServerService.GetVisualizationChartInfoList();
+        await base.OnInitializedAsync();
+    }
+}

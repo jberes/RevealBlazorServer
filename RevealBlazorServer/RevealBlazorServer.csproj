@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RevealBlazorServer</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IgniteUI.Blazor" Version="24.2.71" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Shared/MainLayout.razor.css" CssScope="master_view-scope" />
+    <None Update="Pages/BasicLoad.razor.css" CssScope="basic_load-scope" />
+    <None Update="Pages/BasicAdd.razor.css" CssScope="basic_add-scope" />
+    <None Update="Pages/FilterApi.razor.css" CssScope="filter_api-scope" />
+    <None Update="Pages/VizCatalog.razor.css" CssScope="viz_catalog-scope" />
+    <None Update="Pages/CustomFilter.razor.css" CssScope="custom_filter-scope" />
+    <None Update="Pages/DashboardThumbnails.razor.css" CssScope="dashboard_thumbnails-scope" />
+  </ItemGroup>
+</Project>
