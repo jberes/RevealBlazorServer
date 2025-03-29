@@ -1,4 +1,4 @@
-namespace RevealBlazorServer.Models.NorthwindCloud;
+namespace RevealBlazorServer.Models;
 
 public class Employee
 {

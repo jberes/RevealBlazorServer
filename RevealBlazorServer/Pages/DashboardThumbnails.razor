@@ -1,48 +1,52 @@
 @page "/dashboard-thumbnails"
-@using AcmeAnalyticsServer
-@using Models.AcmeAnalyticsServer
-@inject IAcmeAnalyticsServerService AcmeAnalyticsServerService
+@using RevealBlazorServer.Models
 @inject IJSRuntime JSRuntime
+@inject DashboardService DashboardService
 
 <div class="row-layout dashboard-thumbnails-container">
-    <div class="column-layout group">
-        <IgbList class="list" dashboard_thumbnails-scope>
-            @foreach (var item in _acmeAnalyticsServerDashboardNames)
-            {
-                <IgbListItem @onclick="@(() => OnDashboardCardClicked(item))">
-                    <IgbAvatar slot="start" class="avatar" dashboard_thumbnails-scope>
-                        <span class="material-icons">
-                            person
-                        </span>
-                    </IgbAvatar>
-                    <div slot="title">@item.DashboardTitle</div>
-                    <div slot="subtitle">@item.DashboardFileName</div>
-                </IgbListItem>
-            }
-        </IgbList>
-    </div>
+    @if (dashboardNames != null && dashboardNames.Any())
+        {
+            <IgbList class="list" dashboard_thumbnails-scope>
+                @foreach (var item in dashboardNames)
+                {
+                    <IgbListItem @onclick="@(() => OnDashboardCardClicked(item))">
+                        <IgbAvatar slot="start" class="avatar" dashboard_thumbnails-scope>
+                            <span class="material-icons">
+                                dashboard
+                            </span>
+                        </IgbAvatar>
+                        <div slot="title">@item.DashboardTitle</div>
+                        <div slot="subtitle">@item.DashboardFileName</div>
+                    </IgbListItem>
+                }
+            </IgbList>
+        }
+        else
+        {
+            <p>Loading dashboards...</p>
+        }
+
     <div class="column-layout group_1">
         <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div>
     </div>
 </div>
 
 @code {
-    private string _selectedDashboard1;
-    private List<DashboardNames> _acmeAnalyticsServerDashboardNames = new();
+    private string selectedDashboard;
+    private List<DashboardNames> dashboardNames;
 
     protected override async Task OnInitializedAsync()
     {
-        _acmeAnalyticsServerDashboardNames = await AcmeAnalyticsServerService.GetDashboardNamesList();
-        await base.OnInitializedAsync();
+        dashboardNames = await DashboardService.GetDashboardNamesAsync();
     }
 
     private async Task OnDashboardCardClicked(DashboardNames dashboard)
     {
-        _selectedDashboard1 = dashboard.DashboardFileName;
+        selectedDashboard = dashboard.DashboardFileName;
 
-        if (!string.IsNullOrEmpty(_selectedDashboard1))
+        if (!string.IsNullOrEmpty(selectedDashboard))
         {
-            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", _selectedDashboard1);
+            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", selectedDashboard);
         }
     }
 }

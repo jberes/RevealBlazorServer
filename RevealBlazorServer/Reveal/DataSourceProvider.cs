@@ -1,4 +1,5 @@
-﻿using Reveal.Sdk;
+﻿using System.Data.SqlTypes;
+using Reveal.Sdk;
 using Reveal.Sdk.Data;
 using Reveal.Sdk.Data.Microsoft.SqlServer;
 
@@ -12,6 +13,7 @@ namespace RevealSdk.Server.Reveal
             if (dataSourceItem is RVSqlServerDataSourceItem sqlDsi)
             {
                 ChangeDataSourceAsync(userContext, sqlDsi.DataSource);
+
 
                 if (sqlDsi.Id == "CustOrderHist")
                 {

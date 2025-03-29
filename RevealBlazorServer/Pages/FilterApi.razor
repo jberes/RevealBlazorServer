@@ -1,38 +1,41 @@
 @page "/filter-api"
-@using NorthwindCloud
-@using Models.NorthwindCloud
-@inject INorthwindCloudService NorthwindCloudService
+@using RevealBlazorServer.Models
+@inject DashboardService DashboardService
 @inject IJSRuntime JSRuntime
 
 <div class="row-layout filter-api-container">
     <div class="column-layout group">
-        <IgbList class="list" filter_api-scope>
-            @foreach (var item in _northwindCloudEmployeeStringfAnonymousType9)
-            {
-                <IgbListItem @onclick="@(() => OnEmployeeCardClicked(item))">
-                    <IgbAvatar Src="@(item.Employee?.PhotoPath ?? default)" slot="start" class="avatar" filter_api-scope></IgbAvatar>
-                    <div slot="title">@item.FullName</div>
-                    <div slot="subtitle">@item.Employee?.Title</div>
-                </IgbListItem>
-            }
-        </IgbList>
+        @if (employeeInfo == null)
+        {
+            <p>Loading employees...</p>
+        }
+        else
+        {
+            <IgbList class="list" filter_api-scope>
+                @foreach (var item in employeeInfo)
+                {
+                    <IgbListItem @onclick="@(() => OnEmployeeCardClicked(item))">
+                        <IgbAvatar Src="@(item.Employee?.PhotoPath ?? string.Empty)" slot="start" class="avatar" filter_api-scope></IgbAvatar>
+                        <div slot="title">@item.FullName</div>
+                        <div slot="subtitle">@item.Employee?.Title</div>
+                    </IgbListItem>
+                }
+            </IgbList>
+        }
     </div>
     <div class="column-layout group_1">
-        <div @ref="revealViewRef" id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div>
-
-        @* <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div> *@
+        <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div>
     </div>
 </div>
 
 @code {
-    private int _selectedEmployee;
-    private List<EmployeeStringfAnonymousType9> _northwindCloudEmployeeStringfAnonymousType9 = new();
-    private ElementReference revealViewRef;
-
+    private int selectedEmployee;
+    private List<EmployeeInfo> employeeInfo;
+    private bool readyToRender = false;
 
     protected override async Task OnInitializedAsync()
     {
-        _northwindCloudEmployeeStringfAnonymousType9 = await NorthwindCloudService.GetEmployeeStringfAnonymousType9List();
+        employeeInfo = await DashboardService.GetEmployeesAsync();
         await base.OnInitializedAsync();
     }
 
@@ -44,13 +47,13 @@
         }
     }
 
-    private async Task OnEmployeeCardClicked(EmployeeStringfAnonymousType9 employeeData)
+    private async Task OnEmployeeCardClicked(EmployeeInfo employeeData)
     {
-        _selectedEmployee = employeeData.Employee.EmployeeID;
+        selectedEmployee = employeeData.Employee?.EmployeeID ?? 0;
 
-        if (_selectedEmployee != 0)
+        if (selectedEmployee != 0)
         {
-            await JSRuntime.InvokeVoidAsync("setDashboardFilter", "revealView", "EmployeeID", _selectedEmployee);
+            await JSRuntime.InvokeVoidAsync("setDashboardFilter", "revealView", "EmployeeID", selectedEmployee);
         }
     }
 }

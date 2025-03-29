@@ -1,13 +1,12 @@
 @page "/viz-catalog"
-@using AcmeAnalyticsServer
-@using Models.AcmeAnalyticsServer
-@inject IAcmeAnalyticsServerService AcmeAnalyticsServerService
+@using Models
+@inject DashboardService DashboardService
 
 <div class="row-layout viz-catalog-container">
     <div class="column-layout group">
         <div class="column-layout group_1">
             <IgbList class="list" viz_catalog-scope>
-                @foreach (var item in _acmeAnalyticsServerVisualizationChartInfo)
+                @foreach (var item in visualizationChartInfo)
                 {
                     <IgbListItem>
                         <IgbAvatar Src="@(item.VizChartType ?? default)" slot="start" class="avatar" viz_catalog-scope></IgbAvatar>
@@ -30,11 +29,11 @@
 </div>
 
 @code {
-    private List<VisualizationChartInfo> _acmeAnalyticsServerVisualizationChartInfo = new();
+    private List<VisualizationChartInfo> visualizationChartInfo;
 
     protected override async Task OnInitializedAsync()
     {
-        _acmeAnalyticsServerVisualizationChartInfo = await AcmeAnalyticsServerService.GetVisualizationChartInfoList();
+        visualizationChartInfo = DashboardService.GetVisualizationChartInfos();
         await base.OnInitializedAsync();
     }
 }

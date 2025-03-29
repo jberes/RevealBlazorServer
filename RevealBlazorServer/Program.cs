@@ -1,9 +1,3 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using RevealBlazorServer;
-using RevealBlazorServer.AcmeAnalyticsServer;
-using RevealBlazorServer.NorthwindCloud;
-using RevealBlazorServer.State;
 using IgniteUI.Blazor.Controls;
 using Reveal.Sdk;
 using RevealSdk.Server.Reveal;
@@ -16,10 +10,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpClient();
 
+builder.Services.AddSingleton<DashboardService>();
 
-builder.Services.AddScoped<IAcmeAnalyticsServerService, AcmeAnalyticsServerService>();
-builder.Services.AddScoped<INorthwindCloudService, NorthwindCloudService>();
-builder.Services.AddScoped<IStateService, StateService>();
 RegisterIgniteUI(builder.Services);
 
 void RegisterIgniteUI(IServiceCollection services)

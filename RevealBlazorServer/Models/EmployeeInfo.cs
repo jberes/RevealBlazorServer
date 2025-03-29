@@ -1,6 +1,6 @@
-namespace RevealBlazorServer.Models.NorthwindCloud;
+namespace RevealBlazorServer.Models;
 
-public class EmployeeStringfAnonymousType9
+public class EmployeeInfo
 {
     public Employee Employee { get; set; } = new();
     public string FullName { get; set; }

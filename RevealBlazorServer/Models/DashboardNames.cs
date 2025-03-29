@@ -1,4 +1,4 @@
-namespace RevealBlazorServer.Models.AcmeAnalyticsServer;
+namespace RevealBlazorServer.Models;
 
 public class DashboardNames
 {
