@@ -42,12 +42,25 @@ window.loadRevealView = async function (viewId, dashboardName, headers) {
             sqlDataSourceItem4.id="TenMostExpensiveProducts";
             sqlDataSourceItem4.title = "Ten Most Expensive Products";
             sqlDataSourceItem4.subtitle = "Stored Procedure";
-    
+
+            // ***** Excel Files *****
+             var localFileItem = new $.ig.RVLocalFileDataSourceItem();
+            localFileItem.id = "Northwind Traders Corp Sales"
+            var excelDataSourceItem  = new $.ig.RVExcelDataSourceItem(localFileItem);
+            excelDataSourceItem.id = "Northwind Traders Corp Sales";
+            excelDataSourceItem.title = "Northwind Traders Corp Sales";
+
+            var localFileItem1 = new $.ig.RVLocalFileDataSourceItem();
+            localFileItem1.id = "IceCreamCoFinancials"
+            var excelDataSourceItem1 = new $.ig.RVExcelDataSourceItem(localFileItem1);
+            excelDataSourceItem1.id = "IceCreamCoFinancials";
+            excelDataSourceItem1.title = "IceCreamCoFinancials";
             //**********************************************
             // Note, this is the callback that loads everything above into the dialog.  If you don't want to show the entire
             // database, just remove sqlServerDataSource from the array and leave it empty like this []
             callback(new $.ig.RevealDataSources([sqlServerDataSource],
-                [sqlDataSourceItem1, sqlDataSourceItem2, sqlDataSourceItem3, sqlDataSourceItem4 ], false));
+                [sqlDataSourceItem1, sqlDataSourceItem2, sqlDataSourceItem3, sqlDataSourceItem4,
+                    excelDataSourceItem, excelDataSourceItem1], false));
     
             };
     }
