@@ -141,3 +141,16 @@ window.setDashboardFilter = async function (viewId, filterTitle, filterValue) {
         console.warn("Filter not found:", filterTitle);
     }
 }
+
+window.loadRevealViewWithDom = async function (viewId, json) {
+    const document = dom.RdashDocument.loadFromJson(json);
+    const dashboard = await document.toRVDashboard();
+    var revealView = new $.ig.RevealView("#" + viewId);
+    revealView.interactiveFilteringEnabled = true;
+    revealView.startInEditMode = true;
+    revealView.dashboard = dashboard;
+    revealView.onSave = (sender, e) => {
+        window.builderInstance.invokeMethodAsync('UpdateDashboardTitle', e.name);
+        e.saveFinished();
+    }
+}
