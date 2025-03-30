@@ -32,7 +32,6 @@ namespace RevealSdk.Server.Reveal
                     sqlDsi.Procedure = "Ten Most Expensive Products";
                 }
 
-
                 else if (sqlDsi.Id == "300KRows")
                 {
                     sqlDsi.Procedure = "spGetLoad1m";

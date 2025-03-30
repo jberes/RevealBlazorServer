@@ -1,28 +1,63 @@
-﻿window.loadRevealView = async function (viewId, dashboardName) {
+﻿let additionalHeaders = {};
+
+window.loadRevealView = async function (viewId, dashboardName, headers) {
     let rvDashboard;
 
     if (dashboardName) {
         rvDashboard = await $.ig.RVDashboard.loadDashboard(dashboardName);
     }
 
-    const revealView = createRevealView(viewId, dashboardName);
-    revealView.interactiveFilteringEnabled = true;
+    additionalHeaders = headers || {};
 
-    console.log("dashboardName: " + dashboardName);
-
+    $.ig.RevealSdkSettings.setAdditionalHeadersProvider(function (url) {
+        return headers;
+    });
+    const revealView = createRevealView(viewId);
     if (!rvDashboard) {
         revealView.startInEditMode = true;
 
         revealView.onDataSourcesRequested = (callback) => {
-            const restDataSource = new $.ig.RVRESTDataSource();
-            restDataSource.id = "RestDataSource";
-            restDataSource.url = "https://excel2json.io/api/share/8bf0acfa-7fd8-468e-0478-08daa4a8d995";
-            restDataSource.title = "Auto Users Data - Global";
-            restDataSource.subtitle = "from Excel2Json";
-            restDataSource.useAnonymousAuthentication = true;
-            callback(new $.ig.RevealDataSources([restDataSource], [], false));
-        };
+            var sqlServerDataSource = new $.ig.RVAzureSqlDataSource();
+            sqlServerDataSource.id="sqlServer";
+            sqlServerDataSource.title = "SQL Server Data Source";
+            sqlServerDataSource.subtitle = "Full Northwind Database";
+    
+            // SQL Server Data Source Item in Stored Procs
+            var sqlDataSourceItem1 = new $.ig.RVAzureSqlDataSourceItem(sqlServerDataSource);
+            sqlDataSourceItem1.id="CustomerOrders";
+            sqlDataSourceItem1.title = "Customer Orders";
+            sqlDataSourceItem1.subtitle = "Custom SQL Query (orderId)";
+    
+            var sqlDataSourceItem2 = new $.ig.RVAzureSqlDataSourceItem(sqlServerDataSource);
+            sqlDataSourceItem2.id="CustOrderHist";
+            sqlDataSourceItem2.title = "Customer Orders History";
+            sqlDataSourceItem2.subtitle = "Stored Procedure (customerId)";
+    
+            var sqlDataSourceItem3 = new $.ig.RVAzureSqlDataSourceItem(sqlServerDataSource);
+            sqlDataSourceItem3.id="CustOrdersOrders";
+            sqlDataSourceItem3.title = "Customer Orders Orders";
+            sqlDataSourceItem3.subtitle = "Stored Procedure  (customerId)";
+    
+            var sqlDataSourceItem4 = new $.ig.RVAzureSqlDataSourceItem(sqlServerDataSource);
+            sqlDataSourceItem4.id="TenMostExpensiveProducts";
+            sqlDataSourceItem4.title = "Ten Most Expensive Products";
+            sqlDataSourceItem4.subtitle = "Stored Procedure";
+    
+            //**********************************************
+            // Note, this is the callback that loads everything above into the dialog.  If you don't want to show the entire
+            // database, just remove sqlServerDataSource from the array and leave it empty like this []
+            callback(new $.ig.RevealDataSources([sqlServerDataSource],
+                [sqlDataSourceItem1, sqlDataSourceItem2, sqlDataSourceItem3, sqlDataSourceItem4 ], false));
+    
+            };
     }
+    revealView.dashboard = rvDashboard;
+}
+
+window.createRevealView = function (viewId) {
+    $.ig.RevealSdkSettings.theme = createRevealTheme(viewId);
+    const revealView = new $.ig.RevealView("#" + viewId);
+    revealView.interactiveFilteringEnabled = true;
 
     revealView.onDashboardSelectorRequested = (args) => {
         openDialog(args.callback);
@@ -32,68 +67,10 @@
         return $.ig.RVDashboard.loadDashboard(dashboardId);
     };
 
-    revealView.dashboard = rvDashboard;
-}
-
-window.createRevealView = function (viewId, singleVisualizationMode) {
-    $.ig.RevealSdkSettings.theme = createRevealTheme(viewId, singleVisualizationMode);
-
-    const revealView = new $.ig.RevealView("#" + viewId);
-    //revealView.serverSideSave = false;
-    if (singleVisualizationMode) {
-        revealView.singleVisualizationMode = true;
-        revealView.showHeader = false;
-        revealView.showMenu = false;
-    }
-
-    revealView.onSave = (rv, args) => {
-        if (args.saveAs) {
-            console.log("i am saving as");
-            DotNet.invokeMethodAsync('DashboardViewer', 'PromptForDashboardName')
-                .then(newName => {
-                    console.log("newName " + newName);
-                    if (newName) {
-                        isDuplicateName(newName).then(isDuplicate => {
-                            if (isDuplicate === "true") {
-                                console.log("I am saving dot net");
-                                DotNet.invokeMethodAsync('DashboardViewer', 'ConfirmOverride', newName)
-                                    .then(overrideConfirmed => {
-                                        if (!overrideConfirmed) {
-                                            return;
-                                        }
-                                        args.dashboardId = args.name = newName;
-                                        args.saveFinished();
-                                        console.log("SavedAs Finished " + newName);
-                                        setTimeout(() => {
-                                            DotNet.invokeMethodAsync('DashboardViewer', 'ReloadDashboardList');
-                                        }, 250);
-                                    });
-                            } else {
-                                args.dashboardId = args.name = newName;
-                                args.saveFinished();
-                                console.log("SavedAs Finished " + newName);
-                                setTimeout(() => {
-                                    DotNet.invokeMethodAsync('DashboardViewer', 'ReloadDashboardList');
-                                }, 250);
-                            }
-                        });
-                    }
-                    else {
-                        console.log("No name");
-                    }
-                });
-        } else {
-            args.saveFinished();
-            console.log("Saved Finished " + args);
-            setTimeout(() => {
-                DotNet.invokeMethodAsync('DashboardViewer', 'ReloadDashboardList');
-            }, 250);
-        }
-    }
     return revealView;
   }
 
-window.createRevealTheme = function (viewId, singleVisualizationMode) {
+window.createRevealTheme = function () {
     var theme = $.ig.RevealSdkSettings.theme.clone();
     theme.chartColors = ["#09B1A9", "#003B4A", "#93C569", "#FEB51E", "#FF780D", "#CA365B"];
     theme.regularFont = "Poppins";
@@ -101,16 +78,6 @@ window.createRevealTheme = function (viewId, singleVisualizationMode) {
     theme.boldFont = "Poppins";
     theme.useRoundedCorners = true;
     theme.accentColor = "#09B1A9";
-
-    if (singleVisualizationMode) {
-        theme.dashboardBackgroundColor = "white";
-    }
-    if (viewId === "revealViewNew") {
-        theme.dashboardBackgroundColor = "white";
-    }
-    else {
-        theme.dashboardBackgroundColor = "#F5F5F5";
-    }
     return theme;
 }
 
@@ -130,52 +97,10 @@ function downloadFile(url, filename) {
     document.body.removeChild(link);
 }
 
-window.selectedDashboardCallback = async function (selectedDashboard) {
-    console.log("selectedDashboardCallback called with: " + selectedDashboard);
-    if (window.dialogCallback) {
-        console.log("window.dialogCallback is defined, calling it now.");
-        await window.dialogCallback(selectedDashboard);
-    } else {
-        console.error("window.dialogCallback is not defined.");
-    }
-}
-
-function openDialog(callback) {
-    window.dialogCallback = callback;
-    DotNet.invokeMethodAsync('DashboardViewer', 'ToggleDialog')
-        .then(() => {
-            console.log('OpenDialog - Dialog toggled from JavaScript');
-        })
-        .catch(error => {
-            console.error('OpenDialog - Error toggling dialog from JavaScript', error);
-        });
-}
-
-async function isDuplicateName(dashboardName) {
-    const response = await fetch(`/dashboards/${encodeURIComponent(dashboardName)}/isduplicate`);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return await response.text();
-}
-
 window.getRVDashboardAsJson = async function (dashboardName) {
     const dashboard = await $.ig.RVDashboard.loadDashboard(dashboardName);
     const json = dashboard._dashboardModel.__dashboardModel.toJson();
     return JSON.stringify(json);
-}
-
-window.loadRevealViewWithDom = async function (viewId, json) {
-    const document = dom.RdashDocument.loadFromJson(json);
-    const dashboard = await document.toRVDashboard();
-    var revealView = new $.ig.RevealView("#" + viewId);
-    revealView.interactiveFilteringEnabled = true;
-    revealView.startInEditMode = true;
-    revealView.dashboard = dashboard;
-    revealView.onSave = (sender, e) => {
-        window.builderInstance.invokeMethodAsync('UpdateDashboardTitle', e.name);
-        e.saveFinished();
-    }
 }
 
  $.ig.RevealSdkSettings.enableActionsOnHoverTooltip = true;
@@ -185,8 +110,8 @@ window.loadRevealViewSingleViz = function (viewId, dashboardName, vizId) {
         var revealView = new $.ig.RevealView("#" + viewId);
         revealView.interactiveFilteringEnabled = true;
         revealView.singleVisualizationMode = true;
-        revealView.showHeader = false;
-        revealView.showMenu = false;
+        //revealView.showHeader = false;
+        //revealView.showMenu = false;
         revealView.dashboard = dashboard;
         revealView.maximizedVisualization = dashboard.visualizations.getById(vizId);
     });
@@ -206,8 +131,6 @@ window.registerAddDashboardInstance = function (dotnetRef) {
 
 window.setDashboardFilter = async function (viewId, filterTitle, filterValue) {
     let rvDashboard = await $.ig.RVDashboard.loadDashboard("Employee Sales Analysis");
-
-    //const revealView = createRevealView(viewId, "Employee Sales Analysis");
     const revealView = new $.ig.RevealView("#" + viewId);
     revealView.dashboard = rvDashboard;
 

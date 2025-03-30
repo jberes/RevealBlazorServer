@@ -44,3 +44,12 @@
     min-width: 400px;
     min-height: 200px;
 }
+.dropdown-row {
+    display: flex;
+    gap: 1rem;
+    margin: 0 32px 16px;
+}
+
+.dropdown {
+    width: 250px;
+}

@@ -27,7 +27,7 @@ namespace RevealSdk.Server.Reveal
                     { "EmployeeId", employeeId },
                     { "Role", role } };
 
-            //Console.WriteLine("UserContextProvider: " + userId + " " + orderId + " " + employeeId);
+            Console.WriteLine("UserContextProvider: " + userId + " " + orderId + " " + employeeId);
             
             return new RVUserContext(userId, props);
         }
